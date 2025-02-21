@@ -7,21 +7,20 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.vehiculos
+     * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('vehicles', function (Blueprint $table) {
+        Schema::create('appointments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('client_id')->constrained('client')->onDelete('cascade');
-            $table->string('brand');
-            $table->string('model');
-            $table->string('license_plate')->unique();
-            $table->boolean('validated')->default(false);
-            $table->year('year');
-            $table->string('status');
+            $table->foreignId('vehicle_id')->constrained('vehicles')->onDelete('cascade');
+            $table->string('reason');
+            $table->text('description');
+            $table->time('client_schedule');
+            $table->date('date');
+            $table->boolean('accepted')->default(false);
             $table->timestamps();
-
         });
     }
 
@@ -30,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('vehicles');
+        Schema::dropIfExists('table_appointments');
     }
 };
