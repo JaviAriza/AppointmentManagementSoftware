@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->string('phone');
-            $table->boolean('verified')->default(false);
             $table->timestamps();
         });
     }

@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\LoginController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 
 Route::get('/', function () {
@@ -12,6 +12,34 @@ Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-Auth::routes();
-
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::get('/login', function () {
+    return view('auth.login'); // // Vista
+})->name('login');
+
+// Proceso de login
+Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+
+// Página de registro (formulario)
+Route::get('/register', function () {
+    return view('auth.register'); // Vista
+})->name('register');
+
+// Proceso de registro
+Route::post('/register', [RegisterController::class, 'register'])->name('register.post');
+
+// Logout
+Route::post('/logout', function () {
+    Auth::logout();
+    return redirect('/login');
+})->name('logout');
+
+// Dashboards después del login
+Route::get('/dashboard-client', function () {
+    return view('dashboard.client'); // Asegúrate de tener esta vista en resources/views/dashboard/client.blade.php
+})->middleware('auth')->name('dashboard.client');
+
+Route::get('/dashboard-mechanic', function () {
+    return view('dashboard.mechanic'); // Asegúrate de tener esta vista en resources/views/dashboard/mechanic.blade.php
+})->middleware('auth')->name('dashboard.mechanic');

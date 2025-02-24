@@ -1,0 +1,42 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+
+class Client extends Authenticatable
+{
+    
+
+    /**
+     * La tabla asociada al modelo.
+     *
+     * @var string
+     */
+    protected $table = 'client';
+
+    /**
+     * Los atributos que se pueden asignar de forma masiva.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'name',
+        'surname',
+        'email',
+        'password',
+        'dni',
+        'phone',
+    ];
+
+    /**
+     * Los atributos que deben estar ocultos para arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'password',
+    ];
+
+}

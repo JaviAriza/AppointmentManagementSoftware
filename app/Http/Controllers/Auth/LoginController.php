@@ -4,40 +4,51 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use App\Models\User;
+use App\Models\Client;
+use App\Models\Mechanic;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
-
-
 class LoginController extends Controller
-
 {
-public function login(Request $request)
+    public function login(Request $request)
     {
-    $request->validate([
-        'email' => 'required|email',
-        'password' => 'required',
-    ]);
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-    // Primero, intenta buscar el usuario en la tabla 'clientes'
-    $cliente = User::where('email', $request->email)->first();
+        // Buscar en la tabla 'client'
+        $client = Client::where('email', $request->email)->first();
 
-    if ($cliente && Hash::check($request->password, $cliente->password)) {
-        Auth::login($cliente); // Si es encontrado en la tabla cliente
-        return redirect()->intended('/dashboard');
+        if ($client && Hash::check($request->password, $client->password)) {
+            Auth::login($client);
+            return redirect()->intended('/dashboard-client');
+        }
+
+        // Si no se encuentra en 'client', buscar en la tabla 'mechanic'
+        $mechanic = Mechanic::where('email', $request->email)->first();
+
+        if ($mechanic && Hash::check($request->password, $mechanic->password)) {
+            Auth::login($mechanic);
+            return redirect()->intended('/dashboard-mechanic');
+        }
+
+        // Si no se encuentra en ninguna de las dos tablas
+        return redirect()->back()->withErrors(['email' => 'Credenciales no válidas']);
     }
 
-    // Si no se encuentra en 'clientes', intenta en la tabla 'mechanics'
-    $mechanic = Mechanic::where('email', $request->email)->first();
 
-    if ($mechanic && Hash::check($request->password, $mechanic->password)) {
-        Auth::login($mechanic); // Si es encontrado en la tabla mechanic
-        return redirect()->intended('/dashboard');
+
+    public function logout(Request $request)
+    {
+        Auth::logout(); // Cierra la sesión del usuario
+
+        $request->session()->invalidate(); // Invalida la sesión
+        $request->session()->regenerateToken(); // Regenera el token CSRF para seguridad
+
+        return redirect('/login'); // Redirige a la página de login
     }
 
-    // Si no se encuentra en ninguna de las dos tablas
-    return redirect()->back()->withErrors(['email' => 'Credenciales no válidas']);
-
-}}
+}

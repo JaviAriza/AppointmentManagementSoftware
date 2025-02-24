@@ -3,35 +3,25 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\Client; // Modelo cambiado de User a Client
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class RegisterController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Register Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles the registration of new users as well as their
-    | validation and creation. By default this controller uses a trait to
-    | provide this functionality without requiring any additional code.
-    |
-    */
-
     use RegistersUsers;
 
     /**
-     * Where to redirect users after registration.
+     * Redirección después del registro.
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/dashboard-client';
 
     /**
-     * Create a new controller instance.
+     * Crear una nueva instancia del controlador.
      *
      * @return void
      */
@@ -41,7 +31,7 @@ class RegisterController extends Controller
     }
 
     /**
-     * Get a validator for an incoming registration request.
+     * Validación de datos de registro.
      *
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
@@ -50,20 +40,23 @@ class RegisterController extends Controller
     {
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'surname' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'string', 'max:20'],
+            'dni' => ['required', 'string', 'max:20', 'unique:client,dni'], // Validamos el DNI único en la tabla client
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:client,email'], // Email único en client
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
     }
 
     /**
-     * Create a new user instance after a valid registration.
+     * Crea un nuevo cliente después de un registro válido.
      *
      * @param  array  $data
-     * @return \App\Models\User
+     * @return \App\Models\Client
      */
     protected function create(array $data)
     {
-        return User::create([
+        $client = Client::create([
             'name' => $data['name'],
             'surname' => $data['surname'],
             'phone' => $data['phone'],
@@ -71,5 +64,9 @@ class RegisterController extends Controller
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
+
+        Auth::login($client); // Inicia sesión automáticamente después del registro
+
+        return $client;
     }
 }
