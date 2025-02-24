@@ -4,37 +4,40 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+
+
 
 class LoginController extends Controller
+
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Login Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles authenticating users for the application and
-    | redirecting them to your home screen. The controller uses a trait
-    | to conveniently provide its functionality to your applications.
-    |
-    */
-
-    use AuthenticatesUsers;
-
-    /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
-    protected $redirectTo = '/home';
-
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
+public function login(Request $request)
     {
-        $this->middleware('guest')->except('logout');
-        $this->middleware('auth')->only('logout');
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
+
+    // Primero, intenta buscar el usuario en la tabla 'clientes'
+    $cliente = User::where('email', $request->email)->first();
+
+    if ($cliente && Hash::check($request->password, $cliente->password)) {
+        Auth::login($cliente); // Si es encontrado en la tabla cliente
+        return redirect()->intended('/dashboard');
     }
-}
+
+    // Si no se encuentra en 'clientes', intenta en la tabla 'mechanics'
+    $mechanic = Mechanic::where('email', $request->email)->first();
+
+    if ($mechanic && Hash::check($request->password, $mechanic->password)) {
+        Auth::login($mechanic); // Si es encontrado en la tabla mechanic
+        return redirect()->intended('/dashboard');
+    }
+
+    // Si no se encuentra en ninguna de las dos tablas
+    return redirect()->back()->withErrors(['email' => 'Credenciales no válidas']);
+
+}}
