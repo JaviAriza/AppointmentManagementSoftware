@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Client; // Modelo cambiado de User a Client
+use App\Models\Client;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -39,7 +39,12 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
+            'name' => ['required', 'string', 'max:255'],
+            'surname' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'regex:/^\d{9}$/'],
+            'dni' => ['required', 'regex:/^\d{8}[A-Za-z]$/', 'unique:client,dni'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:client,email'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
     }
 
@@ -60,7 +65,7 @@ class RegisterController extends Controller
             'password' => Hash::make($data['password']),
         ]);
 
-        Auth::login($client); // Inicia sesión automáticamente después del registro
+        Auth::login($client);
 
         return $client;
     }
