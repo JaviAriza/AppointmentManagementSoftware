@@ -119,20 +119,61 @@
 </div>
 
 <script>
-
     document.addEventListener("DOMContentLoaded", function () {
         const form = document.querySelector('form');
         const dniInput = document.getElementById('dni');
+        const phoneInput = document.getElementById('phone');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('password_confirmation');
 
         form.addEventListener('submit', function(event) {
-            const dni = dniInput.value.trim();
-            const dniPattern = /^\d{8}[A-Za-z]$/; // Expresión regular del DNI
+            let valid = true;
 
+            // Validación del DNI
+            const dni = dniInput.value.trim();
+            const dniPattern = /^\d{8}[A-Za-z]$/; // Expresión regular del DNI (8 dígitos seguidos de una letra)
             if (!dniPattern.test(dni)) {
                 alert('El DNI no tiene el formato válido (8 dígitos seguidos de una letra).');
-                event.preventDefault(); // Previene el envío del formulario
+                valid = false;
+            }
+
+            // Validación del teléfono
+            const phone = phoneInput.value.trim();
+            const phonePattern = /^\+?\d{1,4}[-\s]?\(?\d{1,3}\)?[-\s]?\d{3}[-\s]?\d{3,4}$/;
+            if (!phonePattern.test(phone)) {
+                alert('El número de teléfono no tiene el formato válido.');
+                valid = false;
+            }
+
+            // Validación del correo electrónico
+            const email = emailInput.value.trim();
+            const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!emailPattern.test(email)) {
+                alert('El correo electrónico no tiene el formato válido.');
+                valid = false;
+            }
+
+            // Validación de la contraseña (mínimo 8 caracteres)
+            const password = passwordInput.value.trim();
+            if (password.length < 8) {
+                alert('La contraseña debe tener al menos 8 caracteres.');
+                valid = false;
+            }
+
+            // Validación de confirmación de contraseña
+            const confirmPassword = confirmPasswordInput.value.trim();
+            if (password !== confirmPassword) {
+                alert('Las contraseñas no coinciden.');
+                valid = false;
+            }
+
+            // Si alguna validación falla, se previene el envío del formulario
+            if (!valid) {
+                event.preventDefault();
             }
         });
     });
-    </script>
+</script>
+
 @endsection
