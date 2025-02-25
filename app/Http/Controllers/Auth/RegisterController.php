@@ -41,9 +41,9 @@ class RegisterController extends Controller
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
             'surname' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'max:20'],
-            'dni' => ['required', 'string', 'max:20', 'unique:client,dni'], // Validamos el DNI único en la tabla client
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:client,email'], // Email único en client
+            'phone' => ['required', 'String', 'regex:/^\+?\d{1,4}[-\s]?\(?\d{1,3}\)?[-\s]?\d{3}[-\s]?\d{3,4}$/', 'max:20'],
+            'dni' => ['required', 'string', 'unique:client,dni'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:client,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
     }

@@ -8,7 +8,7 @@
                 <div class="card-header">{{ __('Register') }}</div>
 
                 <div class="card-body">
-                    <form method="POST" action="{{ route('register') }}">
+                    <form class="register-form" method="POST" action="{{ route('register') }}">
                         @csrf
 
                         <div class="row mb-3">
@@ -117,4 +117,22 @@
         </div>
     </div>
 </div>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector('form');
+        const dniInput = document.getElementById('dni');
+
+        form.addEventListener('submit', function(event) {
+            const dni = dniInput.value.trim();
+            const dniPattern = /^\d{8}[A-Za-z]$/; // Expresión regular del DNI
+
+            if (!dniPattern.test(dni)) {
+                alert('El DNI no tiene el formato válido (8 dígitos seguidos de una letra).');
+                event.preventDefault(); // Previene el envío del formulario
+            }
+        });
+    });
+    </script>
 @endsection
