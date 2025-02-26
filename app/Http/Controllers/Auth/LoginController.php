@@ -19,7 +19,6 @@ class LoginController extends Controller
             'password' => 'required',
         ]);
 
-        // Buscar en la tabla 'client'
         $client = Client::where('email', $request->email)->first();
 
         if ($client && Hash::check($request->password, $client->password)) {
@@ -27,7 +26,6 @@ class LoginController extends Controller
             return redirect()->intended('/dashboard-client');
         }
 
-        // Si no se encuentra en 'client', buscar en la tabla 'mechanic'
         $mechanic = Mechanic::where('email', $request->email)->first();
 
         if ($mechanic && Hash::check($request->password, $mechanic->password)) {
@@ -35,7 +33,6 @@ class LoginController extends Controller
             return redirect()->intended('/dashboard-mechanic');
         }
 
-        // Si no se encuentra en ninguna de las dos tablas
         return redirect()->back()->withErrors(['email' => 'Credenciales no válidas']);
     }
 
@@ -43,12 +40,11 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
-        Auth::logout(); // Cierra la sesión del usuario
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
-        $request->session()->invalidate(); // Invalida la sesión
-        $request->session()->regenerateToken(); // Regenera el token CSRF para seguridad
-
-        return redirect('/login'); // Redirige a la página de login
+        return redirect('/login'); 
     }
 
 }
