@@ -27,14 +27,12 @@ class LoginController extends Controller
             return redirect()->intended('/dashboard-client');
         }
 
-     
         $mechanic = Mechanic::where('email', $request->email)->first();
 
         if ($mechanic && Hash::check($request->password, $mechanic->password)) {
             Auth::login($mechanic);
             return redirect()->intended('/dashboard-mechanic');
         }
-
 
         return redirect()->back()->withErrors(['email' => 'Credenciales no válidas']);
     }
@@ -44,11 +42,10 @@ class LoginController extends Controller
     public function logout(Request $request)
     {
         Auth::logout();
-
-        $request->session()->invalidate(); 
+        $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        return redirect('/login'); 
     }
 
 }

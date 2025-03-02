@@ -131,7 +131,7 @@
             let valid = true;
 
             const dni = dniInput.value.trim();
-            const dniPattern = /^\d{8}[A-Za-z]$/; 
+            const dniPattern = /^\d{8}[A-Za-z]$/;
             if (!dniPattern.test(dni)) {
                 alert('El DNI no tiene el formato válido (8 dígitos seguidos de una letra).');
                 valid = false;
