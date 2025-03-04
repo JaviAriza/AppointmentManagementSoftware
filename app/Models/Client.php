@@ -7,7 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Client extends Authenticatable
 {
-    
+
 
     /**
      * La tabla asociada al modelo.
@@ -38,5 +38,13 @@ class Client extends Authenticatable
     protected $hidden = [
         'password'
     ];
+
+    /**
+     * Relación uno a muchos con el modelo Vehicle
+     */
+    public function vehicles()
+    {
+        return $this->hasMany(Vehicle::class);
+    }
 
 }
