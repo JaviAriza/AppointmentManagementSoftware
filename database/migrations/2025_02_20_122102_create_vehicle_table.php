@@ -4,25 +4,32 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateVehiclesTable extends Migration
+return new class extends Migration
 {
-    public function up()
+    /**
+     * Run the migrations.vehiculos
+     */
+    public function up(): void
     {
         Schema::create('vehicle', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('client_id')->constrained()->onDelete('cascade');
+            $table->foreignId('client_id')->constrained('client')->onDelete('cascade');
             $table->string('brand');
             $table->string('model');
             $table->string('license_plate')->unique();
             $table->boolean('validated')->default(false);
             $table->year('year');
-            $table->enum('status', ['In queue', 'In reparation', 'Reparated'])->default('In queue');
+            $table->string('status');
             $table->timestamps();
+
         });
     }
 
-    public function down()
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
     {
         Schema::dropIfExists('vehicle');
     }
-}
+};
