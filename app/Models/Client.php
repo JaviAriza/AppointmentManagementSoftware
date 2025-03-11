@@ -30,13 +30,15 @@ class Client extends Authenticatable
         'phone',
     ];
 
+
     /**
      * Los atributos que deben estar ocultos para arrays.
      *
      * @var array
      */
     protected $hidden = [
-        'password'
+        'password',
+        'remember_token',
     ];
 
     /**
@@ -48,3 +50,4 @@ class Client extends Authenticatable
     }
 
 }
+

@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\VehicleController;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     return view('welcome');
@@ -43,3 +45,17 @@ Route::get('/dashboard-client', function () {
 Route::get('/dashboard-mechanic', function () {
     return view('dashboard.mechanic'); // Asegúrate de tener esta vista en resources/views/dashboard/mechanic.blade.php
 })->middleware('auth')->name('dashboard.mechanic');
+
+
+// Nueva ruta: Procesa el formulario para guardar un vehículo
+// Usa el middleware 'auth' para asegurar que solo usuarios autenticados puedan acceder
+Route::post('/vehicle/guardar', [VehicleController::class, 'guardarVehiculo'])->middleware('auth')->name('vehicle.guardar');
+
+// Rutas API para vehículos (mantener las existentes)
+// Agrupadas con el prefijo 'api' para mantener la organización
+Route::prefix('api')->group(function () {
+    Route::post('/vehicles', [VehicleController::class, 'crearVehiculo']);
+    Route::get('/vehicle/obtener', [VehicleController::class, 'obtenerVehiculos'])->name('vehicle.obtener');
+});
+
+
