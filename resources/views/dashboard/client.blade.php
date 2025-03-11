@@ -22,7 +22,7 @@
     .form-group input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
     .form-buttons { display: flex; justify-content: space-between; margin-top: 20px; }
     .form-buttons button { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
-    .btn-save {mbackground: red; color: white; }
+    .btn-save {background: red; color: white; }
     .btn-cancel {background: #ccc;color: #333;}
     .overlay {display: none;position: fixed;top: 0;left: 0;width: 100%;height: 100%;background: rgba(0,0,0,0.5);z-index: 999;}
     .error-message {color: red;font-size: 12px; margin-top: 5px; }
@@ -109,8 +109,7 @@
 
     <form action="{{ route('vehicle.guardar') }}" method="POST">
       @csrf
-
-      <!-- marca -->
+      <!-- Marca -->
       <div class="form-group">
         <label for="brand">Marca:</label>
         <input type="text" id="brand" name="brand" value="{{ old('brand') }}" required>
@@ -118,8 +117,7 @@
         <div class="error-message">{{ $message }}</div>
         @enderror
       </div>
-
-      <!-- modelo -->
+      <!-- Modelo -->
       <div class="form-group">
         <label for="model">Modelo:</label>
         <input type="text" id="model" name="model" value="{{ old('model') }}" required>
@@ -127,8 +125,7 @@
         <div class="error-message">{{ $message }}</div>
         @enderror
       </div>
-
-      <!-- Campo para el año -->
+      <!-- Año -->
       <div class="form-group">
         <label for="year">Año:</label>
         <input type="number" id="year" name="year" value="{{ old('year') }}" min="1900" max="{{ date('Y') }}" required>
@@ -136,8 +133,7 @@
         <div class="error-message">{{ $message }}</div>
         @enderror
       </div>
-
-      <!-- Campo para la matrícula -->
+      <!-- Matrícula -->
       <div class="form-group">
         <label for="license_plate">Matrícula:</label>
         <input type="text" id="license_plate" name="license_plate" value="{{ old('license_plate') }}" required>
@@ -167,8 +163,8 @@
     <h2>Mis Vehículos</h2>
 
     <!-- Lista de vehículos -->
-    @if(isset($vehicles) && count($vehicles) > 0)
-    <div class="vehicles-list">
+    <div id="vehicleList" class="vehicles-list">
+      @if(isset($vehicles) && count($vehicles) > 0)
       @foreach($vehicles as $vehicle)
       <div class="vehicle-item">
         <h3>{{ $vehicle->brand }} {{ $vehicle->model }}</h3>
@@ -191,58 +187,31 @@
         </div>
       </div>
       @endforeach
+      @else
+      <div class="no-vehicles">No tienes vehículos registrados.</div>
+      @endif
     </div>
-    @else
-    <div class="no-vehicles">
-      <p>No tienes vehículos registrados.</p>
-    </div>
-    @endif
   </div>
-
-  <!-- Sección de depuración (solo visible en desarrollo) -->
-  @if(isset($debug) && config('app.env') !== 'production')
-  <div class="debug-section">
-    <h3>Información de depuración</h3>
-    <pre>{{ json_encode($debug, JSON_PRETTY_PRINT) }}</pre>
-
-    @if(isset($client))
-    <h4>Información del cliente</h4>
-    <pre>ID: {{ $client->id }}, Email: {{ $client->email }}</pre>
-    @endif
-
-    <h4>Consulta SQL directa de vehículos</h4>
-    @php
-    $vehiclesFromDB = DB::table('vehicle')->where('client_id', $client->id ?? 0)->get();
-    @endphp
-    <pre>Vehículos encontrados: {{ count($vehiclesFromDB) }}</pre>
-    @foreach($vehiclesFromDB as $v)
-    <pre>ID: {{ $v->id }}, Cliente: {{ $v->client_id }}, Marca: {{ $v->brand }}, Modelo: {{ $v->model }}</pre>
-    @endforeach
-  </div>
-  @endif
 
   <script>
-    // JavaScript para mostrar/ocultar el formulario y la lista de vehículos
+    // Activar el modal de vehículos
     document.addEventListener('DOMContentLoaded', function() {
-      const showFormBtn = document.getElementById('showFormBtn');
-      const vehicleForm = document.getElementById('vehicleForm');
-      const overlay = document.getElementById('overlay');
-      const cancelBtn = document.getElementById('cancelBtn');
-      const successMessage = document.querySelector('.success-message');
-      const errorAlert = document.querySelector('.error-alert');
-
-      // Elementos para la lista de vehículos
       const showVehiclesBtn = document.getElementById('showVehiclesBtn');
       const vehiclesModal = document.getElementById('vehiclesModal');
       const closeVehiclesModal = document.getElementById('closeVehiclesModal');
+      const vehicleList = document.getElementById('vehicleList');
+      const overlay = document.getElementById('overlay');
+      const showFormBtn = document.getElementById('showFormBtn');
+      const vehicleForm = document.getElementById('vehicleForm');
+      const cancelBtn = document.getElementById('cancelBtn');
 
-      // Mostrar el formulario y el overlay
+      // Mostrar formulario
       showFormBtn.addEventListener('click', function() {
         vehicleForm.style.display = 'block';
         overlay.style.display = 'block';
       });
 
-      // Ocultar el formulario y el overlay al hacer clic en Cancelar
+      // Ocultar formulario
       cancelBtn.addEventListener('click', function() {
         vehicleForm.style.display = 'none';
         overlay.style.display = 'none';
@@ -250,44 +219,68 @@
 
       // Mostrar la lista de vehículos y el overlay
       showVehiclesBtn.addEventListener('click', function() {
+        // Mostrar el modal
         vehiclesModal.style.display = 'block';
         overlay.style.display = 'block';
+
+        // Llamar a la API para obtener los vehículos
+        fetch('{{ route("vehicle.obtener") }}')
+          .then(response => response.json())
+          .then(data => {
+            if (data.length > 0) {
+              // Limpiar la lista de vehículos antes de agregar nuevos
+              vehicleList.innerHTML = '';
+
+              // Recorrer los vehículos y agregarlos al modal
+              data.forEach(vehicle => {
+                const vehicleItem = document.createElement('div');
+                vehicleItem.classList.add('vehicle-item');
+
+                vehicleItem.innerHTML = `
+                  <h3>${vehicle.brand} ${vehicle.model}</h3>
+                  <div class="vehicle-details">
+                    <span>Año: ${vehicle.year}</span>
+                    <span>Matrícula: ${vehicle.license_plate}</span>
+                    <span>
+                      Estado:
+                      <span class="status-badge ${vehicle.status === 'In queue' ? 'status-queue' : ''}
+                                                  ${vehicle.status === 'In reparation' ? 'status-reparation' : ''}
+                                                  ${vehicle.status === 'Reparated' ? 'status-reparated' : ''}">
+                        ${vehicle.status}
+                      </span>
+                    </span>
+                    <span>
+                      ${vehicle.validated ? 'Validado' : 'Pendiente de validación'}
+                    </span>
+                  </div>
+                `;
+
+                vehicleList.appendChild(vehicleItem);
+              });
+            } else {
+              vehicleList.innerHTML = `<div class="no-vehicles">No tienes vehículos registrados.</div>`;
+            }
+          })
+          .catch(error => {
+            console.error('Error al obtener los vehículos:', error);
+            vehicleList.innerHTML = `<div class="no-vehicles">Error al cargar los vehículos.</div>`;
+          });
       });
 
-      // Ocultar la lista de vehículos y el overlay al hacer clic en Cerrar
+      // Cerrar el modal y ocultar el overlay
       closeVehiclesModal.addEventListener('click', function() {
         vehiclesModal.style.display = 'none';
         overlay.style.display = 'none';
       });
 
-      // Ocultar el formulario, la lista de vehículos y el overlay al hacer clic fuera
+      // Ocultar la lista de vehículos y el overlay al hacer clic fuera
       overlay.addEventListener('click', function() {
-        vehicleForm.style.display = 'none';
         vehiclesModal.style.display = 'none';
+        vehicleForm.style.display = 'none';
         overlay.style.display = 'none';
       });
-
-      // Ocultar el mensaje de éxito después de 3 segundos
-      if (successMessage) {
-        setTimeout(function() {
-          successMessage.style.display = 'none';
-        }, 3000);
-      }
-
-      // Ocultar el mensaje de error después de 3 segundos
-      if (errorAlert) {
-        setTimeout(function() {
-          errorAlert.style.display = 'none';
-        }, 3000);
-      }
-
-      // Si hay errores de validación, mostrar el formulario
-      @if($errors->any())
-      vehicleForm.style.display = 'block';
-      overlay.style.display = 'block';
-      @endif
     });
   </script>
+
 </body>
 </html>
-

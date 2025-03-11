@@ -54,8 +54,8 @@ Route::post('/vehicle/guardar', [VehicleController::class, 'guardarVehiculo'])->
 // Rutas API para vehículos (mantener las existentes)
 // Agrupadas con el prefijo 'api' para mantener la organización
 Route::prefix('api')->group(function () {
-    Route::get('/vehicles', [VehicleController::class, 'obtenerVehiculos']);
-    Route::get('/vehicles/{id}', [VehicleController::class, 'obtenerVehiculoId']);
     Route::post('/vehicles', [VehicleController::class, 'crearVehiculo']);
-    Route::delete('/vehicles/{id}', [VehicleController::class, 'eliminarVehiculo']);
+    Route::get('/vehicle/obtener', [VehicleController::class, 'obtenerVehiculos'])->name('vehicle.obtener');
 });
+
+
