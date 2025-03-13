@@ -66,6 +66,7 @@ Route::prefix('api')->group(function () {
 Route::get('/mechanic/vehicle', [MechanicController::class, 'obtenerVehiculos'])->name('mechanic.vehicle');
 Route::delete('/mechanic/vehicle/{id}', [MechanicController::class, 'eliminarVehiculo']);
 Route::post('/mechanic/vehicle', [MechanicController::class, 'crearVehiculo']);
+Route::put('/mechanic/vehicle/{id}', [MechanicController::class, 'actualizarVehiculo']);
 
 
 

@@ -1,28 +1,38 @@
-@extends('layouts.app')
+    <html>
+        <head>
+            <style>
+                body { background: #f3f4f6; font-family: Arial, sans-serif; margin: 0; overflow: hidden; }
+                nav.header { background: black; color: white; padding: 15px; display: flex; justify-content: center; align-items: center; height: 60px; position: absolute; width: 100%; margin-top: -80px }
+                nav.header h1 { color: red; font-size: 28px; margin: 0; }
+            </style>
+        </head>
+    @extends('layouts.app')
 
-@section('content')
-<div class="container">
-    <h1>Vehículos en Reparación</h1>
+    @section('content')
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Marca</th>
-                <th>Modelo</th>
-                <th>Matrícula</th>
-                <th>Estado</th>
-                <th>Verificado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody id="vehicle-list">
-            <!-- Los datos se llenarán dinámicamente con JavaScript -->
-        </tbody>
-    </table>
-</div>
+    <nav class="header"><h1>Taller Mecánico RápidoFix</h1></nav>
+    <div class="container">
+        <h1>Vehículos</h1>
 
-<script>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Marca</th>
+                    <th>Modelo</th>
+                    <th>Matrícula</th>
+                    <th>Estado</th>
+                    <th>Verificado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="vehicle-list">
+                
+            </tbody>
+        </table>
+    </div>
+
+    <script>
 document.addEventListener("DOMContentLoaded", function() {
     fetch("/mechanic/vehicle")
         .then(response => response.json())
@@ -45,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function() {
                             </select>
                         </td>
                         <td>
-                            <input type="checkbox" class="verified-check" ${vehicle.verified ? 'checked' : ''}>
+                            <input type="checkbox" class="validated-check" ${vehicle.validated ? 'checked' : ''}> <!-- Cambié "verified" por "validated" -->
                         </td>
                         <td>
                             <button class="btn btn-success save-btn">Guardar</button>
@@ -56,43 +66,33 @@ document.addEventListener("DOMContentLoaded", function() {
                 tableBody.innerHTML += row;
             });
 
-            // Asignar eventos a los botones
             document.querySelectorAll(".save-btn").forEach(btn => {
                 btn.addEventListener("click", function() {
                     let row = this.closest("tr");
                     let vehicleId = row.dataset.id;
                     let updatedVehicle = {
-                        id: vehicleId,
-                        brand: row.cells[1].innerText,
-                        model: row.cells[2].innerText,
-                        license_plate: row.cells[3].innerText,
                         status: row.querySelector(".status-select").value,
-                        verified: row.querySelector(".verified-check").checked ? 1 : 0
+                        validated: row.querySelector(".validated-check").checked ? 1 : 0
                     };
 
-                    // Guardar datos en localStorage
-                    localStorage.setItem("vehicle_" + vehicleId, JSON.stringify(updatedVehicle));
 
-                    // Eliminar el vehículo
-                    fetch(`/mechanic/vehicle/${vehicleId}`, { method: "DELETE", headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" } })
-                        .then(response => response.json())
-                        .then(() => {
-                            // Crear el vehículo con los datos actualizados
-                            return fetch("/mechanic/vehicle", {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                                },
-                                body: JSON.stringify(updatedVehicle)
-                            });
-                        })
-                        .then(response => response.json())
-                        .then(() => {
-                            alert("Vehículo actualizado correctamente");
-                            location.reload();
-                        })
-                        .catch(error => console.error("Error:", error));
+                    fetch(`/mechanic/vehicle/${vehicleId}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                        },
+                        body: JSON.stringify(updatedVehicle)
+                    })
+                    .then(response => response.json())
+                    .then(() => {
+                        alert("Vehículo actualizado correctamente");
+
+
+                        row.querySelector(".status-select").value = updatedVehicle.status;
+                        row.querySelector(".validated-check").checked = updatedVehicle.validated;
+                    })
+                    .catch(error => console.error("Error:", error));
                 });
             });
 
@@ -105,7 +105,9 @@ document.addEventListener("DOMContentLoaded", function() {
                         .then(response => response.json())
                         .then(() => {
                             alert("Vehículo eliminado correctamente");
-                            location.reload();
+
+
+                            row.remove();
                         })
                         .catch(error => console.error("Error eliminando:", error));
                 });
@@ -113,5 +115,9 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .catch(error => console.error("Error cargando vehículos:", error));
 });
-</script>
-@endsection
+
+
+    </script>
+
+    @endsection
+    </html>
