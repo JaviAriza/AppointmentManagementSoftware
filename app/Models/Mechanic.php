@@ -9,18 +9,8 @@ class Mechanic extends Authenticatable
 {
     use HasFactory;
 
-    /**
-     * La tabla asociada al modelo.
-     *
-     * @var string
-     */
-    protected $table = 'mechanic';
+    protected $table = 'mechanic'; // 🔹 Especificamos la tabla
 
-    /**
-     * Los atributos que se pueden asignar de forma masiva.
-     *
-     * @var array
-     */
     protected $fillable = [
         'name',
         'surname',
@@ -29,12 +19,13 @@ class Mechanic extends Authenticatable
         'phone',
     ];
 
-    /**
-     * Los atributos que deben estar ocultos para arrays.
-     *
-     * @var array
-     */
     protected $hidden = [
         'password',
     ];
+
+    // 🔹 Relación con vehículos
+    public function vehicles()
+    {
+        return $this->hasMany(Vehicle::class, 'mechanic_id');
+    }
 }

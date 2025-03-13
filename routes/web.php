@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\VehicleController;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\MechanicController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -57,5 +58,14 @@ Route::prefix('api')->group(function () {
     Route::post('/vehicles', [VehicleController::class, 'crearVehiculo']);
     Route::get('/vehicle/obtener', [VehicleController::class, 'obtenerVehiculos'])->name('vehicle.obtener');
 });
+
+
+
+
+
+Route::get('/mechanic/vehicle', [MechanicController::class, 'obtenerVehiculos'])->name('mechanic.vehicle');
+Route::delete('/mechanic/vehicle/{id}', [MechanicController::class, 'eliminarVehiculo']);
+Route::post('/mechanic/vehicle', [MechanicController::class, 'crearVehiculo']);
+
 
 

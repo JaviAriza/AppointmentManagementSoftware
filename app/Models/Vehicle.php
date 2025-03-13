@@ -31,5 +31,10 @@ class Vehicle extends Model
 
     // Asegurarse de que se manejen las columnas created_at y updated_at
     public $timestamps = true;
+    public function mechanic()
+{
+    return $this->belongsTo(Mechanic::class, 'mechanic_id');
+}
+
 }
 
